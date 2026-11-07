@@ -4,3 +4,5 @@ obj/
 .vs/
 *.sdltm
 release/*.exe
+SdltmWriter.exe
+*.exe
