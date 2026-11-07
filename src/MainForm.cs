@@ -40,14 +40,14 @@ public partial class MainForm : Form
             var langs = langMatches.Select(m => m.Groups[1].Value).Distinct().Take(2).ToList();
             if (langs.Count >= 2)
             {
-                cmbSource.Text = langs[0];
-                cmbTarget.Text = langs[1];
+                SelectComboByCode(cmbSource, langs[0]);
+                SelectComboByCode(cmbTarget, langs[1]);
             }
             else if (langs.Count == 1)
             {
                 var header = Regex.Match(content, @"srclang=""([^""]+)""");
-                if (header.Success) cmbSource.Text = header.Groups[1].Value;
-                cmbTarget.Text = langs[0] == "en-US" ? "zh-CN" : "en-US";
+                if (header.Success) SelectComboByCode(cmbSource, header.Groups[1].Value);
+                SelectComboByCode(cmbTarget, langs[0].ToLower().StartsWith("en") ? "zh-CN" : "en-US");
             }
         }
         catch { }
@@ -64,8 +64,8 @@ public partial class MainForm : Form
         if (_tmxPath == null) return;
         btnExport.Enabled = false;
         lblStatus.Text = "转换中...";
-        var srcLang = cmbSource.Text.Trim();
-        var trgLang = cmbTarget.Text.Trim();
+        var srcLang = GetSelectedCode(cmbSource);
+        var trgLang = GetSelectedCode(cmbTarget);
         var outPath = Path.ChangeExtension(_tmxPath, ".sdltm");
         
         try

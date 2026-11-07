@@ -3,16 +3,23 @@ namespace SdltmWriter;
 partial class MainForm
 {
     private System.ComponentModel.IContainer components = null;
+    private Panel pnlMain;
     private Label lblTitle;
     private Label lblSub;
+    private Panel pnlDrop;
+    private Label lblDropIcon;
+    private Label lblDropText;
+    private Label lblDropHint;
     private TextBox txtFile;
     private Button btnBrowse;
     private Label lblSource;
     private ComboBox cmbSource;
+    private Label lblArrow;
     private Label lblTarget;
     private ComboBox cmbTarget;
     private Button btnExport;
     private Label lblStatus;
+    private Label lblInfo;
 
     protected override void Dispose(bool disposing)
     {
@@ -20,61 +27,120 @@ partial class MainForm
         base.Dispose(disposing);
     }
 
+    internal static readonly (string Code, string Name)[] Languages = new[]
+    {
+        ("zh-CN",  "简体中文（中国大陆）"),
+        ("zh-TW",  "繁体中文（台湾）"),
+        ("zh-HK",  "繁体中文（香港）"),
+        ("en-US",  "英语（美国）"),
+        ("en-GB",  "英语（英国）"),
+        ("ja-JP",  "日语（日本）"),
+        ("ko-KR",  "韩语（韩国）"),
+        ("de-DE",  "德语（德国）"),
+        ("fr-FR",  "法语（法国）"),
+        ("es-ES",  "西班牙语（西班牙）"),
+        ("ru-RU",  "俄语（俄罗斯）"),
+        ("pt-BR",  "葡萄牙语（巴西）"),
+        ("it-IT",  "意大利语（意大利）"),
+    };
+
     private void InitializeComponent()
     {
         SuspendLayout();
-        // Form
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(480, 380);
-        Text = "SDLTM Writer — TMX → Trados 翻译记忆";
+        ClientSize = new Size(440, 420);
+        Text = "SDLTM Writer";
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
-        BackColor = Color.FromArgb(30, 30, 46);
-        Font = new Font("Segoe UI", 10F);
+        BackColor = Color.FromArgb(24, 24, 32);
+        Font = new Font("Segoe UI", 9.5F);
 
-        // Title
-        lblTitle = new Label { Text = "SDLTM Writer", Font = new Font("Segoe UI", 18F, FontStyle.Bold), ForeColor = Color.FromArgb(233, 69, 96), Location = new Point(24, 20), AutoSize = true };
-        lblSub = new Label { Text = "TMX → Trados Studio 翻译记忆转换", ForeColor = Color.FromArgb(136, 136, 136), Location = new Point(24, 56), AutoSize = true };
+        pnlMain = new Panel { Dock = DockStyle.Fill, Padding = new Padding(28, 20, 28, 16), BackColor = Color.Transparent };
 
-        // File
-        txtFile = new TextBox { Location = new Point(24, 96), Size = new Size(340, 28), ReadOnly = true, BackColor = Color.FromArgb(40, 40, 60), ForeColor = Color.White, PlaceholderText = "拖拽 .tmx 文件到窗口，或点击浏览..." };
-        btnBrowse = new Button { Text = "浏览...", Location = new Point(372, 94), Size = new Size(84, 30), BackColor = Color.FromArgb(15, 52, 96), ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
-        btnBrowse.Click += BtnBrowse_Click;
+        lblTitle = new Label { Text = "SDLTM Writer", Font = new Font("Segoe UI Semibold", 16F), ForeColor = Color.FromArgb(240, 240, 245), Location = new Point(0, 0), AutoSize = true };
+        lblSub = new Label { Text = "TMX \u2192 Trados Studio \u7ffb\u8bd1\u8bb0\u5fc6\u8f6c\u6362", Font = new Font("Microsoft YaHei UI", 9F), ForeColor = Color.FromArgb(120, 120, 140), Location = new Point(0, 32), AutoSize = true };
 
-        // Language selectors
-        lblSource = new Label { Text = "源语言", ForeColor = Color.White, Location = new Point(24, 142), AutoSize = true };
-        cmbSource = new ComboBox { Location = new Point(24, 166), Size = new Size(200, 28), DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Color.FromArgb(40, 40, 60), ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
-        cmbSource.Items.AddRange(new object[] { "zh-CN", "zh-TW", "en-US", "en-GB", "ja-JP", "ko-KR", "de-DE", "fr-FR", "es-ES", "ru-RU" });
+        pnlDrop = new Panel { Location = new Point(0, 66), Size = new Size(384, 88), BackColor = Color.FromArgb(32, 32, 44), Cursor = Cursors.Hand };
+        pnlDrop.Paint += (s, e) => { using var pen = new Pen(Color.FromArgb(50, 50, 68), 1.5f); e.Graphics.DrawRectangle(pen, 0, 0, pnlDrop.Width - 1, pnlDrop.Height - 1); };
+        lblDropIcon = new Label { Text = "\u21ea", Font = new Font("Segoe UI Symbol", 22F), ForeColor = Color.FromArgb(70, 70, 95), Location = new Point(20, 18), AutoSize = true };
+        lblDropText = new Label { Text = "\u62d6\u5165 .tmx \u6587\u4ef6", Font = new Font("Microsoft YaHei UI", 10F), ForeColor = Color.FromArgb(160, 160, 180), Location = new Point(72, 24), AutoSize = true };
+        lblDropHint = new Label { Text = "\u6216\u70b9\u51fb\u9009\u62e9\u6587\u4ef6", Font = new Font("Microsoft YaHei UI", 8F), ForeColor = Color.FromArgb(80, 80, 100), Location = new Point(72, 46), AutoSize = true };
+        pnlDrop.Controls.AddRange(new Control[] { lblDropIcon, lblDropText, lblDropHint });
+        pnlDrop.Click += (s, e) => btnBrowse.PerformClick();
+        pnlDrop.MouseEnter += (s, e) => { pnlDrop.BackColor = Color.FromArgb(38, 38, 52); lblDropIcon.ForeColor = Color.FromArgb(233, 80, 100); };
+        pnlDrop.MouseLeave += (s, e) => { pnlDrop.BackColor = Color.FromArgb(32, 32, 44); lblDropIcon.ForeColor = Color.FromArgb(70, 70, 95); };
+        pnlDrop.DragEnter += (s, e) => { if (e.Data?.GetDataPresent(DataFormats.FileDrop) == true) { e.Effect = DragDropEffects.Copy; pnlDrop.BackColor = Color.FromArgb(45, 40, 58); } };
+        pnlDrop.DragLeave += (s, e) => pnlDrop.BackColor = Color.FromArgb(32, 32, 44);
+        pnlDrop.DragDrop += OnDropPanel;
+
+        txtFile = new TextBox { Location = new Point(0, 162), Size = new Size(310, 26), ReadOnly = true, BorderStyle = BorderStyle.FixedSingle, BackColor = Color.FromArgb(32, 32, 44), ForeColor = Color.FromArgb(180, 180, 200), Font = new Font("Consolas", 8.5F) };
+        btnBrowse = new Button { Text = "\u6d4f\u89c8", Location = new Point(316, 161), Size = new Size(68, 27), BackColor = Color.FromArgb(45, 45, 62), ForeColor = Color.FromArgb(180, 180, 200), FlatStyle = FlatStyle.Flat, Font = new Font("Microsoft YaHei UI", 8.5F), Cursor = Cursors.Hand };
+        btnBrowse.FlatAppearance.BorderColor = Color.FromArgb(55, 55, 75);
+        btnBrowse.FlatAppearance.MouseOverBackColor = Color.FromArgb(55, 55, 78);
+        btnBrowse.Click += (s, e) => { using var dlg = new OpenFileDialog { Filter = "TMX|\u00b7.tmz;\u00b7.xml|\u00b7\u00b7\u00b7|*.*", Title = "\u9009\u62e9 TMX \u6587\u4ef6" }; if (dlg.ShowDialog() == DialogResult.OK) { _tmxPath = dlg.FileName; txtFile.Text = Path.GetFileName(_tmxPath); btnExport.Enabled = true; DetectLanguages(); } };
+
+        lblSource = new Label { Text = "\u6e90\u8bed\u8a00", Font = new Font("Microsoft YaHei UI", 8.5F), ForeColor = Color.FromArgb(130, 130, 150), Location = new Point(0, 198), AutoSize = true };
+        cmbSource = new ComboBox { Location = new Point(0, 218), Size = new Size(170, 26), DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Color.FromArgb(32, 32, 44), ForeColor = Color.FromArgb(220, 220, 235), FlatStyle = FlatStyle.Flat, Font = new Font("Microsoft YaHei UI", 9F) };
+        foreach (var (code, name) in Languages) cmbSource.Items.Add(new ComboItem(code, name));
         cmbSource.SelectedIndex = 0;
-        
-        var lblArrow = new Label { Text = "→", ForeColor = Color.FromArgb(233, 69, 96), Font = new Font("Segoe UI", 14F, FontStyle.Bold), Location = new Point(232, 164), AutoSize = true };
-        
-        lblTarget = new Label { Text = "目标语言", ForeColor = Color.White, Location = new Point(256, 142), AutoSize = true };
-        cmbTarget = new ComboBox { Location = new Point(256, 166), Size = new Size(200, 28), DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Color.FromArgb(40, 40, 60), ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
-        cmbTarget.Items.AddRange(new object[] { "en-US", "en-GB", "zh-CN", "zh-TW", "ja-JP", "ko-KR", "de-DE", "fr-FR", "es-ES", "ru-RU" });
-        cmbTarget.SelectedIndex = 2;
 
-        // Export button
-        btnExport = new Button { Text = "导出 SDLTM", Location = new Point(24, 220), Size = new Size(432, 44), BackColor = Color.FromArgb(233, 69, 96), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 12F, FontStyle.Bold), Enabled = false, Cursor = Cursors.Hand };
+        lblArrow = new Label { Text = "\u2192", Font = new Font("Segoe UI", 13F), ForeColor = Color.FromArgb(233, 80, 100), Location = new Point(178, 219), AutoSize = true };
+
+        lblTarget = new Label { Text = "\u76ee\u6807\u8bed\u8a00", Font = new Font("Microsoft YaHei UI", 8.5F), ForeColor = Color.FromArgb(130, 130, 150), Location = new Point(214, 198), AutoSize = true };
+        cmbTarget = new ComboBox { Location = new Point(214, 218), Size = new Size(170, 26), DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Color.FromArgb(32, 32, 44), ForeColor = Color.FromArgb(220, 220, 235), FlatStyle = FlatStyle.Flat, Font = new Font("Microsoft YaHei UI", 9F) };
+        foreach (var (code, name) in Languages) cmbTarget.Items.Add(new ComboItem(code, name));
+        cmbTarget.SelectedIndex = 3;
+
+        btnExport = new Button { Text = "\u5bfc\u51fa SDLTM", Location = new Point(0, 262), Size = new Size(384, 42), BackColor = Color.FromArgb(233, 80, 100), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Microsoft YaHei UI", 11F, FontStyle.Bold), Enabled = false, Cursor = Cursors.Hand };
         btnExport.FlatAppearance.BorderSize = 0;
+        btnExport.FlatAppearance.MouseOverBackColor = Color.FromArgb(210, 68, 88);
+        btnExport.FlatAppearance.MouseDownBackColor = Color.FromArgb(185, 55, 75);
         btnExport.Click += BtnExport_Click;
 
-        // Status
-        lblStatus = new Label { Text = "拖拽 .tmx 文件到窗口开始", ForeColor = Color.FromArgb(136, 136, 136), Location = new Point(24, 280), Size = new Size(432, 40), AutoSize = false };
+        lblStatus = new Label { Text = "\u62d6\u5165\u6587\u4ef6\u5f00\u59cb", Font = new Font("Microsoft YaHei UI", 8.5F), ForeColor = Color.FromArgb(100, 100, 120), Location = new Point(0, 314), Size = new Size(384, 22), TextAlign = ContentAlignment.MiddleCenter };
 
-        // Info
-        var lblInfo = new Label { 
-            Text = "输出: Trados Studio 兼容 .sdltm\n包含: 精确哈希 + 模糊索引(fi1-fi8) + Token 数据\n首次打开请执行一次「重建索引」", 
-            ForeColor = Color.FromArgb(80, 80, 80), 
-            Location = new Point(24, 320), 
-            Size = new Size(432, 50), 
-            AutoSize = false,
-            Font = new Font("Segoe UI", 8F) 
-        };
+        lblInfo = new Label { Text = "\u8f93\u51fa\u683c\u5f0f: Trados Studio \u517c\u5bb9 .sdltm  \u00b7  \u5305\u542b\u7cbe\u786e\u5339\u914d + \u6a21\u7cca\u7d22\u5f15\n\u9996\u6b21\u5728 Trados \u4e2d\u6253\u5f00\u65f6\u6267\u884c\u4e00\u6b21\u300c\u91cd\u5efa\u7d22\u5f15\u300d\u5373\u53ef", Font = new Font("Microsoft YaHei UI", 7.5F), ForeColor = Color.FromArgb(60, 60, 80), Location = new Point(0, 368), Size = new Size(384, 36), TextAlign = ContentAlignment.TopCenter };
 
-        Controls.AddRange(new Control[] { lblTitle, lblSub, txtFile, btnBrowse, lblSource, cmbSource, lblArrow, lblTarget, cmbTarget, btnExport, lblStatus, lblInfo });
+        pnlMain.Controls.AddRange(new Control[] { lblTitle, lblSub, pnlDrop, txtFile, btnBrowse, lblSource, cmbSource, lblArrow, lblTarget, cmbTarget, btnExport, lblStatus, lblInfo });
+        Controls.Add(pnlMain);
+        AcceptButton = btnExport;
         ResumeLayout(false);
+    }
+
+    private void OnDropPanel(object? s, DragEventArgs e)
+    {
+        pnlDrop.BackColor = Color.FromArgb(32, 32, 44);
+        if (e.Data?.GetData(DataFormats.FileDrop) is not string[] files || files.Length == 0) return;
+        var f = files[0];
+        if (!f.EndsWith(".tmx", StringComparison.OrdinalIgnoreCase) && !f.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+        { lblStatus.Text = "\u2717 \u8bf7\u62d6\u5165 .tmx \u6587\u4ef6"; lblStatus.ForeColor = Color.FromArgb(240, 80, 80); return; }
+        _tmxPath = f;
+        txtFile.Text = Path.GetFileName(f);
+        btnExport.Enabled = true;
+        lblStatus.Text = $"\u5df2\u9009\u62e9: {Path.GetFileName(f)} ({new FileInfo(f).Length / 1024.0:F1} KB)";
+        lblStatus.ForeColor = Color.FromArgb(100, 200, 120);
+        DetectLanguages();
+    }
+
+    internal static void SelectComboByCode(ComboBox cmb, string code)
+    {
+        for (int i = 0; i < cmb.Items.Count; i++)
+        {
+            if (((ComboItem)cmb.Items[i]).Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+            { cmb.SelectedIndex = i; return; }
+        }
+    }
+
+    internal static string GetSelectedCode(ComboBox cmb)
+        => ((ComboItem)cmb.SelectedItem!).Code;
+
+    internal class ComboItem
+    {
+        public string Code { get; }
+        public string Name { get; }
+        public ComboItem(string code, string name) { Code = code; Name = name; }
+        public override string ToString() => Name;
     }
 }
